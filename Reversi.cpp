@@ -254,6 +254,12 @@ public:
     }
     void displayBoard() //ВЫВОД ДОСКИ НА ДИСПЛЕЙ
     {
+        cout << "\n" << "  +";
+        for (int i = 0; i < n; i++)
+        {
+            cout << "——------";
+        }
+        cout << "\n";
         for (int i = 0; i < n; i++)
         {
             cout << i <<" | "<< "\t";
@@ -273,10 +279,10 @@ public:
             else { cout << "\n" << "  | " << "\n"; }
         }
         cout << "\t0\t1\t2\t3\t4\t5\t6\t7\n";
-        cout << "Осталось фишек у Игрока №" << getOppPlayer() << ": " << remainingCoins['B'] << "\n";
-        cout << "Осталось фишек у Игрока №" << getPlayer() << ": " << remainingCoins['W'] << "\n";
-        cout << "Счёт Игрока №" << getOppPlayer() << ": " << coinsCountOnBoard['B'] << "\n";
-        cout << "Счёт Игрока №" << getPlayer() << ": " << coinsCountOnBoard['W'] << "\n";
+        cout << "Осталось фишек у Игрока: " << remainingCoins['W'] << "\n";
+        cout << "Осталось фишек у Компьютера: " << remainingCoins['B'] << "\n";
+        cout << "Счёт Игрока: " << coinsCountOnBoard['W'] << "\n";
+        cout << "Счёт Компьютера: " << coinsCountOnBoard['B'] << "\n";
         return;
     }
 
@@ -440,7 +446,11 @@ int main()
 
     while (!Game.isGameOver())
     {
-        cout << "Ходит Игрок №" << Game.getPlayer() << "\n";
+        if (Game.getPlayer() == 1)
+        {
+            cout << "Ваш ход" << "\n";
+        }
+
         if (Game.getPlayer() == 2)
         {
             Game.turnComp();
@@ -458,6 +468,10 @@ int main()
         {
             Game.makeMove(row, col);
             system("cls");
+            if (Game.getPlayer() == 1)
+            {
+                cout << "Компьютер сделал свой ход. Координаты: " << row << " " << col << "\n";
+            }
             Game.displayBoard();
         }
         else
