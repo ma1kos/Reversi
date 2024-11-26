@@ -22,7 +22,7 @@ class Reversi
     int winner;
     int list;
     int r;
-    int scoreS;
+    //int scoreS;
     unordered_map<char, int> remainingCoins;
     unordered_map<char, int> coinsCountOnBoard;
 
@@ -36,7 +36,7 @@ public:
         compPlr = -1;
         winner = 0;
         list = 0;
-        scoreS = 0;
+        //scoreS = 0;
         vector<char> temp;
         board.resize(20);
         for (int i = 0; i < n; i++)
@@ -109,7 +109,7 @@ private:
                 coinsCountOnBoard[colour]++;
                 coinsCountOnBoard[oppColour]--;
             }
-            if (oppColour == 'W')
+            /*if (oppColour == 'W')
             {
                 scoreS++; // ПОВЫШЕНИЕ СЧЁТЧИКА ДЛЯ МИНИМАКС
             }
@@ -117,7 +117,7 @@ private:
             {
                 scoreS--; // ПОНИЖЕНИЕ СЧЁТЧИКА ДЛЯ МИНИМАКС
             }
-
+            */
             row += deltaRow;
             col += deltaCol;
         }
@@ -306,8 +306,7 @@ public:
                     player = compPlr;
                     board[1][i][j] = 'B';
                     flipCoins('B', i, j);
-                    score = minimax(4, 1);
-                    scoreS = 0;
+                    score = minimax(5, 1);
                     board[1] = board[0];
                     if (score > max_score)
                     {
@@ -344,14 +343,14 @@ public:
                 }
             }
         }
-        return W - B;
+        return B - W;
     }
 
     int minimax(int depth, int plr) // АЛГОРИТМ МИНИМАКС
     {
         if (depth == 0)
         {
-            return scoreS;
+            return sum();
 
         }
         //ПРОВЕРКУ НА КОНЕЦ ИГРЫ
@@ -379,12 +378,12 @@ public:
                     }
                 }
             }
-            return max_score;
+            //return max_score;
         }
         else // ХОД ИГРОКА, ЗНАЧИТ ИЩЕМ ХУДШИЙ РЕЗУЛЬТАТ(MIN)
         {
             player = plr;
-            min_score = INT_MAX;
+            max_score = INT_MAX;
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < n; j++)
@@ -398,13 +397,13 @@ public:
                         board[list] = board[list - 1];
                         list--;
                         player = plr;
-                        min_score = min(score, min_score);
+                        max_score = min(score, max_score);
                     }
                 }
             }
-            return min_score;
 
         }
+        return max_score;
     }
 
     bool isGameOver() // ПРОВЕРКА НА КОНЕЦ ИГРЫ
