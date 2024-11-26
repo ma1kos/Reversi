@@ -6,7 +6,7 @@
 using namespace std;
 
 
-class Othello
+class Reversi
 {
     struct coord
     {
@@ -20,25 +20,21 @@ class Othello
     int compPlr;
     int winner;
     int list;
-    // int depth;
-     //int max_score;
-     //int min_score;
+    int r;
     int scoreS;
     unordered_map<char, int> remainingCoins;
     unordered_map<char, int> coinsCountOnBoard;
 
 
 public:
-    Othello()
+    Reversi()
     {
+        r = 0;
         list = 0;
-        // max_score = 0;
         player = 1;
         compPlr = -1;
         winner = 0;
         list = 0;
-        //depth = 2;
-        //min_score = 0;
         scoreS = 0;
         vector<char> temp;
         board.resize(20);
@@ -79,10 +75,8 @@ private:
 
         if (board[list][row][col] == oppColour)
         {
-            while ((row > 0) && (row < 7) && (col > 0) && (col < 7))
+            while ((row >= 0) && (row < 8) && (col >= 0) && (col < 8))
             {
-                row += deltaRow;
-                col += deltaCol;
                 if (board[list][row][col] == '-')
                 {
                     return false;
@@ -91,6 +85,9 @@ private:
                 {
                     return true;
                 }
+
+                row += deltaRow;
+                col += deltaCol;
             }
         }
         return false;
@@ -106,8 +103,11 @@ private:
         while (board[list][row][col] == oppColour)
         {
             board[list][row][col] = colour;
-            coinsCountOnBoard[colour]++;
-            coinsCountOnBoard[oppColour]--;
+            if (list == 0 && r == 0)
+            {
+                coinsCountOnBoard[colour]++;
+                coinsCountOnBoard[oppColour]--;
+            }
             if (oppColour == 'W')
             {
                 scoreS++; // ПОВЫШЕНИЕ СЧЁТЧИКА ДЛЯ МИНИМАКС
@@ -134,7 +134,6 @@ public:
     }
     bool isValidMove(int row, int col)
     {
-        // move.row = 1; 
         if ((row < 0) || (row >= 8) || (col < 0) || (col >= 8))
         {
             return false;
@@ -212,42 +211,42 @@ public:
     }
     void flipCoins(char colourF, int rowF, int colF) // ПЕРЕВОРАЧИВАНИЕ ПОБИТЫХ ФИШЕК
     {
-        // Check Up
+        // ПРОВЕРКА ВВЕРХ
         if (checkFlip(colourF, rowF - 1, colF, -1, 0))
         {
             changeCoins(colourF, rowF - 1, colF, -1, 0);
         }
-        // Check Down
+        // ПРОВЕРКА ВНИЗ
         if (checkFlip(colourF, rowF + 1, colF, 1, 0))
         {
             changeCoins(colourF, rowF + 1, colF, 1, 0);
         }
-        // Check Left
+        // ПРОВЕРКА ВЛЕВО
         if (checkFlip(colourF, rowF, colF - 1, 0, -1))
         {
             changeCoins(colourF, rowF, colF - 1, 0, -1);
         }
-        // Check Right
+        // ПРОВЕРКА ВПРАВО
         if (checkFlip(colourF, rowF, colF + 1, 0, 1))
         {
             changeCoins(colourF, rowF, colF + 1, 0, 1);
         }
-        // Check Down-Right
+        // ПРОВЕРКА ВНИЗ И ВПРАВО
         if (checkFlip(colourF, rowF + 1, colF + 1, 1, 1))
         {
             changeCoins(colourF, rowF + 1, colF + 1, 1, 1);
         }
-        // Check Down-Left
+        // ПРОВЕРКА ВНИЗ И ВЛЕВО
         if (checkFlip(colourF, rowF + 1, colF - 1, 1, -1))
         {
             changeCoins(colourF, rowF + 1, colF - 1, 1, -1);
         }
-        // Check Top-Right
+        // ПРОВЕРКА ВВЕРХ И ВПРАВО
         if (checkFlip(colourF, rowF - 1, colF + 1, -1, 1))
         {
             changeCoins(colourF, rowF - 1, colF + 1, -1, 1);
         }
-        // Check Top-Left
+        // ПРОВЕРКА ВВЕРХ И ВЛЕВО
         if (checkFlip(colourF, rowF - 1, colF - 1, -1, -1))
         {
             changeCoins(colourF, rowF - 1, colF - 1, -1, -1);
@@ -257,18 +256,27 @@ public:
     {
         for (int i = 0; i < n; i++)
         {
-            cout << i << "\t";
+            cout << i <<" | "<< "\t";
             for (int j = 0; j < n; j++)
             {
                 cout << board[0][i][j] << "\t";
             }
-            cout << "\n";
+            if (i == n - 1)
+            {
+                cout << "\n" << "  +";
+                for (int i = 0; i < n; i++)
+                {
+                    cout << "——------";
+                }
+                cout << "\n";
+            }
+            else { cout << "\n" << "  | " << "\n"; }
         }
         cout << "\t0\t1\t2\t3\t4\t5\t6\t7\n";
-        cout << "Coins left for Player-" << getOppPlayer() << ": " << remainingCoins['B'] << "\n";
-        cout << "Coins left for Player-" << getPlayer() << ": " << remainingCoins['W'] << "\n";
-        cout << "Coins on board for Player-" << getOppPlayer() << ": " << coinsCountOnBoard['B'] << "\n";
-        cout << "Coins on board for Player-" << getPlayer() << ": " << coinsCountOnBoard['W'] << "\n";
+        cout << "Осталось фишек у Игрока №" << getOppPlayer() << ": " << remainingCoins['B'] << "\n";
+        cout << "Осталось фишек у Игрока №" << getPlayer() << ": " << remainingCoins['W'] << "\n";
+        cout << "Счёт Игрока №" << getOppPlayer() << ": " << coinsCountOnBoard['B'] << "\n";
+        cout << "Счёт Игрока №" << getPlayer() << ": " << coinsCountOnBoard['W'] << "\n";
         return;
     }
 
@@ -276,7 +284,7 @@ public:
     {
         int max_score;
         int score;
-        scoreS = 0;
+        r = 1;
         compPlr = player;
         max_score = INT_MIN;
         board[1] = board[0];
@@ -292,6 +300,7 @@ public:
                     board[1][i][j] = 'B';
                     flipCoins('B', i, j);
                     score = minimax(3, 1);
+                    scoreS = 0;
                     board[1] = board[0];
                     if (score > max_score)
                     {
@@ -302,6 +311,7 @@ public:
                 }
             }
         }
+        r = 0;
         player = compPlr;
         list = 0;
         return;
@@ -311,23 +321,12 @@ public:
     {
         if (depth == 0)
         {
-            //list--;
             return scoreS;
 
         }
-
-        /*if (player == -1)
-        {
-            player = 1;
-        }
-        else
-        {
-            player = -1;
-        }*/
         //ПРОВЕРКУ НА КОНЕЦ ИГРЫ
         int score = 0;
         int max_score; int min_score;
-        //list++;
         board[list + 1] = board[list];
         if (plr == -1) // ХОД КОМПЬЮТЕРА, ЗНАЧИТ ИЩЕМ ЛУЧШИЙ РЕЗУЛЬТАТ(MAX)
         {
@@ -340,11 +339,8 @@ public:
                     if (board[list][i][j] == '-' && isValidMove(i, j))
                     {
                         list++;
-                        //player = compPlr;
                         board[list][i][j] = 'B';
-                        scoreS = 0;
                         flipCoins('B', i, j);
-                        //depth--;
                         score = minimax(depth - 1, 1);
                         board[list] = board[list - 1];
                         list--;
@@ -353,7 +349,6 @@ public:
                     }
                 }
             }
-            //list--;
             return max_score;
         }
         else // ХОД ИГРОКА, ЗНАЧИТ ИЩЕМ ХУДШИЙ РЕЗУЛЬТАТ(MIN)
@@ -367,11 +362,8 @@ public:
                     if (board[list][i][j] == '-' && isValidMove(i, j))
                     {
                         list++;
-                        //player = compPlr;
                         board[list][i][j] = 'W';
-                        scoreS = 0;
                         flipCoins('W', i, j);
-                        // depth--;
                         score = minimax(depth - 1, -1);
                         board[list] = board[list - 1];
                         list--;
@@ -380,7 +372,6 @@ public:
                     }
                 }
             }
-            //list--;
             return min_score;
 
         }
@@ -440,15 +431,16 @@ public:
 
 int main()
 {
-    Othello Game;
-    cout << "The Game has started.\n";
+    Reversi Game;
+    setlocale(LC_ALL, "Russian");
+    cout << "Игра началась.\n";
     Game.displayBoard();
     int row;
     int col;
 
     while (!Game.isGameOver())
     {
-        cout << "Player-" << Game.getPlayer() << "'s turn.\n";
+        cout << "Ходит Игрок №" << Game.getPlayer() << "\n";
         if (Game.getPlayer() == 2)
         {
             Game.turnComp();
@@ -457,31 +449,31 @@ int main()
         }
         else
         {
-            cout << "Enter the Row Number: ";
+            cout << "Введите номер строки: ";
             cin >> row;
-            cout << "Enter the Column Number: ";
+            cout << "Введите номер столбца: ";
             cin >> col;
         }
         if (Game.isValidMove(row, col))
         {
             Game.makeMove(row, col);
+            system("cls");
+            Game.displayBoard();
         }
         else
         {
-            cout << "Invalid Move. Try Again.\n";
+            cout << "Невозможный ход!!!!!\n";
         }
-
-        Game.displayBoard();
     }
 
-    cout << "Game Over.\n";
+    cout << "Конец игры.\n";
     if (Game.getWinner() != 0)
     {
-        cout << "The winner is Player-" << Game.getWinner() << ".\n";
+        cout << "Победил Игрок № " << Game.getWinner() << ".\n";
     }
     else
     {
-        cout << "The match ended in a draw.\n";
+        cout << "Игра закончилась ничьёй.\n";
     }
 
     return 0;
