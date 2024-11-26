@@ -1,7 +1,8 @@
-﻿#include <unordered_map>
+﻿//﻿#include <unordered_map>
 #include <iostream>
 #include <vector>
-#include <string.h>
+#include <string.h>﻿
+#include <unordered_map>
 
 using namespace std;
 
@@ -262,7 +263,7 @@ public:
         cout << "\n";
         for (int i = 0; i < n; i++)
         {
-            cout << i <<" | "<< "\t";
+            cout << i << " | " << "\t";
             for (int j = 0; j < n; j++)
             {
                 cout << board[0][i][j] << "\t";
@@ -305,7 +306,7 @@ public:
                     player = compPlr;
                     board[1][i][j] = 'B';
                     flipCoins('B', i, j);
-                    score = minimax(3, 1);
+                    score = minimax(4, 1);
                     scoreS = 0;
                     board[1] = board[0];
                     if (score > max_score)
@@ -321,6 +322,29 @@ public:
         player = compPlr;
         list = 0;
         return;
+    }
+
+    int sum()
+    {
+        int W = 0; int B = 0;
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if (board[list][i][j] == 'W')
+                {
+                    W++;
+                }
+                else
+                {
+                    if (board[list][i][j] == 'B')
+                    {
+                        B++;
+                    }
+                }
+            }
+        }
+        return W - B;
     }
 
     int minimax(int depth, int plr) // АЛГОРИТМ МИНИМАКС
